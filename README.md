@@ -139,12 +139,18 @@ gvim/vim tb_good_mux.v
 
 Working:
 
-```bash
 read_verilog : read design
 read_liberty : read library
 write_verilog : write out netlist
-```
 ![Yosys Setup](images/yosys-setup.png)
+
+## How to verify synthesis correctness?
+
+- Having netlist (verilog code in terms of standard cells) and testbench (same as RTL Design's TestBench) , these being inputs for the simulator gives out the VCD file which can be used to verify using GTKWave.
+
+
+![Yosys Synthesis Verification](images/synthesis-verify.png)
+
 ### Labs using Yosys and Sky130 PDKs
 
 
