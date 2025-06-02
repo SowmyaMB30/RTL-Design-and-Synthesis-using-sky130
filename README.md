@@ -63,5 +63,5 @@ VLSI
 ```
 ---
 
-Day - 2 : Timing libs, Hierarchical vs Flat Synthesis and Efficient Flop Coding Styles
+## Day - 2 : Timing libs, Hierarchical vs Flat Synthesis and Efficient Flop Coding Styles
 
