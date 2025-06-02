@@ -46,8 +46,13 @@ brew install yosys
 
 ### Introduction to open-source simulator iverilog
 
+- Simulator: Tool to check our RTL Design(Implementation of a spec).
 - Open-source Verilog simulation and compilation tool.
 - Used to compile Verilog design files and generate simulation results.
+- TestBench: Setup to apply stimulus to the design to check its functionality. 
+
+![Icarus Verilog Simulation Flow](images/simulation-flow.png)
+
 
 ### Labs using iverilog and gtkwave
 
