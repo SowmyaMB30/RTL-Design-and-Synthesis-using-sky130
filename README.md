@@ -1,8 +1,8 @@
 # RTL-Design-and-Synthesis-using-sky130
 
 ## Table Of Contents
-- [Day - 1](#day-1-introduction-to-verilog-simulation-and-synthesis)
-- [Day - 2](#day-2-timing-libs-hierarchical-vs-flat-synthesis-and-efficient-flop-coding-styles)
+- [Day - 1](#--day-1-introduction-to-verilog-simulation-and-synthesis)
+- [Day - 2](#day--2--timing-libs-hierarchical-vs-flat-synthesis-and-efficient-flop-coding-styles)
 - [Day - 3](#day-3-combinational-and-sequential-optimizations)
 - [Day - 4](#day-4-gls-blocking-vs-non---blocking-and-synthesis-mismatch)
 - [Day - 5](#day-5-optimization-in-synthesis)
