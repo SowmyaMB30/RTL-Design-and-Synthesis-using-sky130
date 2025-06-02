@@ -134,11 +134,17 @@ gvim/vim tb_good_mux.v
 
 ### Introduction to Yosys and Logic synthesis
 
-
 - Open-source framework for Verilog synthesis.
 - Converts RTL designs into gate-level netlists.
 
+Working:
 
+```bash
+read_verilog : read design
+read_liberty : read library
+write_verilog : write out netlist
+```
+![Yosys Setup](images/yosys-setup.png)
 ### Labs using Yosys and Sky130 PDKs
 
 
