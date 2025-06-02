@@ -29,3 +29,36 @@ On the first day of the workshop, we were introduced to the fundamentals of Veri
 brew install iverilog
 brew install gtkwave
 brew install yosys
+```
+---
+VSD Workflow 
+
+```bash
+
+VLSI
+.
+├── sky130RTLDesignAndSynthesisWorkshop
+   ├── DC_WORKSHOP
+   │   ├── lib
+   │   ├── README.md
+   │   └── verilog_files
+   ├── lib
+   │   └── sky130_fd_sc_hd__tt_025C_1v80.lib
+   ├── my_lib
+   │   └── verilog_model
+   ├── README.md
+   ├── verilog_files
+   │   ├── good_mux.v
+   │   ├── good_counter.v
+   │   ├── bad_counter.v
+   │   ├── tb_good_mux.v
+   │   ├── tb_good_mux.vcd
+   │           .
+   │           .
+   │           .
+   └── yosys_run.sh
+```
+---
+
+
+
