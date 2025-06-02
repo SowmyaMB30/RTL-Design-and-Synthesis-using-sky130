@@ -1,15 +1,14 @@
 # RTL-Design-and-Synthesis-using-sky130
 
 ## Table Of Contents
-- [Day-1](#day-1)
-- [Day-2](#day-2)
-- [Day-3](#day-3)
-- [Day-4](#day-4)
-- [Day-5](#day-5)
-
-
+- [Day 1](#day-1)
+- [Day 2](#day-2)
+- [Day 3](#day-3)
+- [Day 4](#day-4)
+- [Day 5](#day-5)
 ---
-## Day-1:Introduction to Verilog, Simulation, and Synthesis
+## Day 1
+## Topic : Introduction to Verilog, Simulation, and Synthesis
 ## Tools Introduced
 
 ### 1. **Icarus Verilog (iverilog)**
@@ -62,6 +61,6 @@ VLSI
    └── yosys_run.sh
 ```
 ---
-
-## Day-2 : Timing libs, Hierarchical vs Flat Synthesis and Efficient Flop Coding Styles
+## Day 2
+## Topics : Timing libs, Hierarchical vs Flat Synthesis and Efficient Flop Coding Styles
 
