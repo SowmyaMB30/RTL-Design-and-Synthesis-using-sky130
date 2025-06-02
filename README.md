@@ -101,6 +101,7 @@ VLSI
  ## Loading design to iverilog:
 
  Eg : good_mux.v tb_good_mux.v
+
 Step 1: 
 ```bash
 iverilog design name.v testbench-associated.v
@@ -127,6 +128,7 @@ gtkwave tb_good_mux.vcd
 - View the waveform to check then input and output of the design.
 
 ## File structure/content lookup:
+
 ```bash
 gvim/vim (filename.v)
 gvim/vim good_mux.v
@@ -140,9 +142,11 @@ gvim/vim tb_good_mux.v
 
 Working:
 
+```bash
 read_verilog : read design
 read_liberty : read library
 write_verilog : write out netlist
+```
 
 ![Yosys Setup](images/yosys-setup.png)
 
