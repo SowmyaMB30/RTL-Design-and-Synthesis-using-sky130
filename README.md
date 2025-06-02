@@ -2,11 +2,13 @@
 
 
 ## Day 1: Introduction to Verilog, Simulation, and Synthesis
-
-On the first day of the workshop, we were introduced to the fundamentals of Verilog for RTL (Register Transfer Level) design, along with the tools necessary for simulation and synthesis of digital logic circuits.
+## Day 2: Timing libs , hierarchical vs flat synthesis and efficient flop coding styles
+## Day 3: Combinational and sequential optimizations
+## Day 4: GLS , blocking vs non - blocking and Synthesis mismatch
+## Day 5: Optimization in synthesis
 
 ---
-
+# Day 1:
 ## Tools Introduced
 
 ### 1. **Icarus Verilog (iverilog)**
