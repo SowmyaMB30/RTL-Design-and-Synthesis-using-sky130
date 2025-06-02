@@ -9,7 +9,7 @@
 
 
 ---
-# Day 1:Introduction to Verilog, Simulation, and Synthesis
+## Day 1:Introduction to Verilog, Simulation, and Synthesis
 ## Tools Introduced
 
 ### 1. **Icarus Verilog (iverilog)**
