@@ -29,3 +29,9 @@ On the first day of the workshop, we were introduced to the fundamentals of Veri
 brew install iverilog
 brew install gtkwave
 brew install yosys
+
+---
+
+##Icarus
+
+<img width="1216" alt="Screenshot 2025-06-01 at 11 38 13 PM" src="https://github.com/user-attachments/assets/c813005e-1cca-436e-900b-93a355f2adf4" />
