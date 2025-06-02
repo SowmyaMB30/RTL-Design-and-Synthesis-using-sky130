@@ -39,9 +39,9 @@
 ##Installation Commands (macOS – using Homebrew)
 
 ```bash
-brew install iverilog
-brew install gtkwave
-brew install yosys
+> brew install iverilog
+> brew install gtkwave
+> brew install yosys
 ```
 
 ### Introduction to open-source simulator iverilog
@@ -64,7 +64,7 @@ brew install yosys
 - Create a directory named VLSI.
   
 ```bash
-git clone https://github.com/kunalg123/sky130RTLDesignAndSynthesisWorkshop
+> git clone https://github.com/kunalg123/sky130RTLDesignAndSynthesisWorkshop
 ```
 
 VSD Workflow 
@@ -104,17 +104,17 @@ VLSI
 
 Step 1: 
 ```bash
-iverilog design name.v testbench-associated.v
-eg: iverilog good_mux.v tb_good_mux.v
+> iverilog design name.v testbench-associated.v
+eg: > iverilog good_mux.v tb_good_mux.v
 ```
 - A file will be generated:
 
 ```bash
-a.out
+a.out (file generated)
 ```
 Step 2 : Execute a.out
 ```bash
-./a.out
+> ./a.out
 ```
 - A Vcd file will be generated. For this example:
 ```bash
@@ -123,16 +123,16 @@ tb_good_mux.vcd will be generated
 Step 3: Load it to simulator
 
 ```bash
-gtkwave tb_good_mux.vcd
+> gtkwave tb_good_mux.vcd
 ```
 - View the waveform to check then input and output of the design.
 
 ## File structure/content lookup:
 
 ```bash
-gvim/vim (filename.v)
-gvim/vim good_mux.v
-gvim/vim tb_good_mux.v
+> gvim/vim (filename.v)
+> gvim/vim good_mux.v
+> gvim/vim tb_good_mux.v
 ```
 
 ### Introduction to Yosys and Logic synthesis
@@ -141,6 +141,8 @@ gvim/vim tb_good_mux.v
 - Converts RTL designs into gate-level netlists.
 
 Working:
+
+Commands:
 
 ```bash
 read_verilog : read design
@@ -157,17 +159,307 @@ write_verilog : write out netlist
 
 ![Yosys Synthesis Verification](images/synthesis-verify.png)
 
-### Labs using Yosys and Sky130 PDKs
+### Labs using Yosys and Sky130 PDKs : How to invoke Yosys and synthesize the design
 
+To invoke yosys:
 
+```bash
+
+> yosys
+```
+![Yosys Command](images/yosys-command.png)
+
+### Inside Yosys Prompt:
+
+# 1. Command to read library:
+
+```bash
+> read_liberty -lib lib/sky130....lib
+```
+# 2. Command to read design:
+
+```bash
+> read_verilog filename.v
+> read_verilog good_mux.v (example)
+```
+" Successfully finished Verilog Frontend." message should pop-up after the command.
+```
+> synth -top ( module needed to be synthesized)
+> synth -top good_mux (example)
+```
+# 3. Command to generate netlist
+
+```bash
+> abc -liberty lib/sky....lib (convert RTL to gates accordinly from library)
+```
+ABC identifies the inputs and the cells used to build the design from the library.
+
+# 4. Command for logic realised:
+
+```
+> show
+```
+
+# 5. Command to write netlist:
+
+```
+> write_verilog filename_netlist.v
+> write_verilog good_mux_netlist.v (example)
+```
+
+```
+write_verilog -noattr good_mux_netlist.v (simplified netlist)
+```
 
 ---
 ## Day 2
-## Topics : Timing libs, Hierarchical vs Flat Synthesis and Efficient Flop Coding Styles
+
+## Topic : Timing libs, Hierarchical vs Flat Synthesis and Efficient Flop Coding Styles
 
 ### Introduction to timing .libs
 
+- Library walk-through
+ 
+## sky130_fc_sc_hd_tt_025C_1v80.lib is the library name
+
+1. 130 - 130nm
+2. tt - typical ( can be slow , fast or typical)
+3. 025C - temperature
+4. 1v8 - Voltage
+
+## Important terminologies for a design to work
+
+P V T
+P - Process
+V - Voltage
+T - Temperature
+
+Variations will be there according to PVT ( determines how Si is going to work)
+
+Eg: CD Player produced and sold in Switzerland , Dubai , India
+Dubai ( temp > 30 - 50c)
+Switzerland (temp < 20 or maybe negative)
+But CD Player should work irrespective of temp variations!
+
+- There will be lot of cells in the library that has usage of multiple gates in multiple combinations.
+- Has features of the cell (leakage power, area, power port info, transition , delay according to pins , timing information etc)
+##  For example: cell("sky130_fd_sc_hd_and2_0")
+
+- Two inputs - A and B (4 possible states) 
+- Output - X
+- 3 different areas are found w.r.t and2_0 , and2_2 , and 2_4
+
+![PVT Variations](images/area-diff.png)
+
+## Larger area => wider transistor usage
+- Wider cells are faster but has large area and power usage.
+## Smaller area => narrow transistor usage
+- Narrow cells have delay more and area is less.
+
 ### Hierarchical vs Flat Synthesis
+
+# example: multiple_modules.v
+```
+module sub_module2 (input a, input b, output y);
+        assign y = a | b;
+endmodule
+
+module sub_module1 (input a, input b, output y);
+        assign y = a&b;
+endmodule
+
+module multiple_modules (input a, input b, input c , output y);
+        wire net1;
+        sub_module1 u1(.a(a),.b(b),.y(net1));  //net1 = a&b
+        sub_module2 u2(.a(net1),.b(c),.y(y));  //y = net1|c ,ie y = a&b + c;
+endmodule
+
+```
+- module sub_module1 - AND gate (instantiated as u1)
+- module sub_module2 - OR gate  (instantiated as u2)
+
+![Multiple_Modules](images/multiple-modules.png)
+
+# Synthesizing multiple_modules.v
+
+```
+> read_liberty -lib lib/sky....lib
+> read_verilog multiple_modules.v
+> synth -top multiple_modules
+> abc -liberty lib/sky....lib
+> show
+
+```
+# synth -top multiple_modules output:
+
+![Multiple_Modules](images/synth-top-mult-modules.png)
+
+- Inferred sub-module1 has 1 AND gate.
+- Inferred sub-module2 has 1 OR gate.
+- Top module has sub-module 1 and 2 instances.
+
+# abc -liberty lib/sky...lib output:
+
+![Multiple_Modules - abc output](images/mult-modules-abc.png)
+
+```
+> show multiple_modules
+```
+![Multiple_Modules - abc output after show command](images/mult-modules-abc-show.png)
+
+- Interestingly , it does not show AND and OR gate but shows as u1 and u2 which are the instantiations. This is called Hierarchial design!!
+```
+> write_verilog multiple_modules_hier.v
+> exit
+> vim/gvim multiple_modules_hier.v
+```
+# multiple_modules_hier.v
+
+```
+/* Generated by Yosys 0.53 (git sha1 53c22ab7c0ced80861c7536c5dae682c30fb5834, clang++ 17.0.0 -fPIC -O3) */
+
+(* top =  1  *)
+(* src = "verilog_files/multiple_modules.v:10.1-14.10" *)
+module multiple_modules(a, b, c, y);
+  (* src = "verilog_files/multiple_modules.v:10.32-10.33" *)
+  input a;
+  wire a;
+  (* src = "verilog_files/multiple_modules.v:10.41-10.42" *)
+  input b;
+  wire b;
+  (* src = "verilog_files/multiple_modules.v:10.50-10.51" *)
+  input c;
+  wire c;
+  (* src = "verilog_files/multiple_modules.v:11.7-11.11" *)
+  wire net1;
+  (* src = "verilog_files/multiple_modules.v:10.61-10.62" *)
+  output y;
+  wire y;
+  (* module_not_derived = 32'd1 *)
+  (* src = "verilog_files/multiple_modules.v:12.14-12.38" *)
+  sub_module1 u1 (
+    .a(a),
+    .b(b),
+    .y(net1)
+  );
+  (* module_not_derived = 32'd1 *)
+  (* src = "verilog_files/multiple_modules.v:13.14-13.38" *)
+  sub_module2 u2 (
+    .a(net1),
+    .b(c),
+    .y(y)
+  );
+endmodule
+
+(* src = "verilog_files/multiple_modules.v:5.1-7.10" *)
+module sub_module1(a, b, y);
+  (* src = "verilog_files/multiple_modules.v:5.27-5.28" *)
+  wire _0_;
+  (* src = "verilog_files/multiple_modules.v:5.36-5.37" *)
+  wire _1_;
+  (* src = "verilog_files/multiple_modules.v:5.46-5.47" *)
+  wire _2_;
+  (* src = "verilog_files/multiple_modules.v:5.27-5.28" *)
+  input a;
+  wire a;
+  (* src = "verilog_files/multiple_modules.v:5.36-5.37" *)
+  input b;
+  wire b;
+  (* src = "verilog_files/multiple_modules.v:5.46-5.47" *)
+  output y;
+  wire y;
+  sky130_fd_sc_hd__and2_0 _3_ (
+    .A(_1_),
+    .B(_0_),
+    .X(_2_)
+  );
+  assign _1_ = b;
+  assign _0_ = a;
+  assign y = _2_;
+endmodule
+
+(* src = "verilog_files/multiple_modules.v:1.1-3.10" *)
+module sub_module2(a, b, y);
+  (* src = "verilog_files/multiple_modules.v:1.27-1.28" *)
+  wire _0_;
+  (* src = "verilog_files/multiple_modules.v:1.36-1.37" *)
+  wire _1_;
+  (* src = "verilog_files/multiple_modules.v:1.46-1.47" *)
+  wire _2_;
+  (* src = "verilog_files/multiple_modules.v:1.27-1.28" *)
+  input a;
+  wire a;
+  (* src = "verilog_files/multiple_modules.v:1.36-1.37" *)
+  input b;
+  wire b;
+  (* src = "verilog_files/multiple_modules.v:1.46-1.47" *)
+  output y;
+  wire y;
+  sky130_fd_sc_hd__or2_0 _3_ (
+    .A(_1_),
+    .B(_0_),
+    .X(_2_)
+  );
+  assign _1_ = b;
+  assign _0_ = a;
+  assign y = _2_;
+endmodule
+
+```
+
+```
+> write_verilog -noattr multiple_modules_hier.v
+> exit
+> vim/gvim multiple_modules_hier.v
+```
+
+# multiple_modules_hier.v ( with -noattr)
+
+![Multiple_Modules - Hier](images/mult-modules-hier.png)
+
+![Multiple_Modules - Hier](images/mult-modules-hier-exp.png)
+
+- NAND Gate = Stacked N-MOS + Parellel P-MOS
+- NOR Gate = Stacked P-MOS + Parellel N-MOS
+- STACKED P-MOS = BAD!! (P-MOS has poor mobility and to improve this , we need to use wider transistors).
+
+# Flattened netlist 
+
+```
+> flatten
+> write_verilog multiple_modules_flat.v
+> exit
+> vim/gvim verilog_files/multiple_modules_flat.v
+
+```
+# multiple_modules_flat.v
+
+![Multiple_Modules - Flat](images/mult-modules-flat.png)
+
+- Direct instantiation of OR and AND gate is found and there is no u1 and u2 instantiation just like in hierarchial!
+
+![Multiple_Modules - Flat output](images/mult-modules-flat-exp.png)
+
+# Sub-Module Level Synthesis
+
+```
+> yosys
+> read_liberty -lib lib/sky....lib
+> read_verilog verilog_files/multiple_modules.v
+> synth -top sub_module1
+> abc -liberty lib/sky...lib
+> show
+  ```
+![Sub-Module Synthesis output](images/sub-module-synth.png)
+
+![Sub-Module Synthesis output- show command](images/sub-module-synth-show.png)
+
+- sub module 1 alone will be seen but not the other modules.
+
+# Why sub-module level synthesis?
+
+- Preferred when we have multiple instances of the same module.
+- When we want to do divide and conquer approach ( Design is massive and tool not able to do its job.)
 
 ### Various Flop Coding Styles and optimization
 
