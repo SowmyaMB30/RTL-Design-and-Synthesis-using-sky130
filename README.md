@@ -502,7 +502,43 @@ Note: Initialize the flop (reset or set which can be either synchronous or async
  ![DFF with async reset - show](images/async-show.png)
 
  # Interesting optimization
-   
+
+Files : mult_2.v and mult_8.v
+Case - mult_2.v
+```
+module mult_2 (input [2:0] a , output [3:0} y);
+assign y = a*2;
+endmodule
+```
+ ![Mult-2](images/mult-2.png)  
+
+ - We come to know that:
+(any number) * 2 = the number appended with one 0.
+(any number) * 4 = the number appended with two 0s.
+(any number) * 8 = the number appended with three 0s.
+
+# Result in synthesizer:
+- No cells will be synthesized and it can be inferred from the output.
+
+```
+> yosys
+.
+.
+.
+```
+![Mult-2 synthesized output](images/mult-2-synth.png)
+
+- Taking another example in mind:
+```
+module mult8 (input [2:0] a , output [5:0] y);
+assign y = 9 * a;
+endmodule
+```  
+![Mult-8 Concept](images/mult-8.png)
+
+We also have the netlist below:
+
+![Mult-8 Netlist](images/mult-8-netlist.png)
 
 ---
 
