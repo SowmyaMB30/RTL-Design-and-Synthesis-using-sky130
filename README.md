@@ -463,6 +463,60 @@ endmodule
 
 ### Various Flop Coding Styles and optimization
 
+- How to code a flop / Different coding styles for flops
+- Files location : verilog_files/ff.v
+
+# Why flops?
+- When input is given to a combinational circuit, ouput is going to change after a propagation delay.
+- Propagatio delay = glitch
+
+  ![GLITCH](images/wh-flops-glitch.png)
+
+- In the above example , a and b are inputs of AND gate with a delay of 2 ns and i0 is the output wire of a and b. i0 is OR-ed with c input with a delay of 1ns. The waveform depicts the difference of 1 ns(momentarily y , the output goes low) which is called a GLITCH.
+
+- More combinationa circuits , more glitchy which is evident from above example.
+
+- To avoid glitches , we need a memory element that can store the value , which are called FLOPS.
+
+- Flop output changes only on the edge of the clock (even if inputs are glitchy , output will be stable).
+
+# How to code a Flop?
+
+Note: Initialize the flop (reset or set which can be either synchronous or asynchronous)
+
+1. Flop with asynchronous (does not wait/irrespective of a clock) reset (./dff_asyncres.v)
+
+
+2. Flop with asynchronous (does not wait/irrespective of a clock) set
+
+```
+module dff_asynch(input clk ,input rst, input d , output reg q);
+always@(posedge clk, posedge rst)
+begin
+if(rst)
+q <= 1'b1; (set=1)
+else
+q <=d;
+end
+endmodule
+
+```
+3. Flop with synchronous (does not wait/irrespective of a clock) reset
+
+```
+module dff_asynch(input clk ,input rst, input d , output reg q);
+always@(posedge clk, posedge rst)
+begin
+if(rst)
+q <= 1'b1; (set=1)
+else
+q <=d;
+end
+endmodule
+
+```
+   
+
 ---
 
 ## Day 3
