@@ -470,7 +470,7 @@ endmodule
 - When input is given to a combinational circuit, ouput is going to change after a propagation delay.
 - Propagatio delay = glitch
 
-  ![GLITCH](images/wh-flops-glitch.png)
+  ![GLITCH](images/why-flops-glitch.png)
 
 - In the above example , a and b are inputs of AND gate with a delay of 2 ns and i0 is the output wire of a and b. i0 is OR-ed with c input with a delay of 1ns. The waveform depicts the difference of 1 ns(momentarily y , the output goes low) which is called a GLITCH.
 
@@ -484,7 +484,7 @@ endmodule
 
 Note: Initialize the flop (reset or set which can be either synchronous or asynchronous)
 
-1. Flop with asynchronous (does not wait/irrespective of a clock) reset (./dff_asyncres.v)
+1. Flop with asynchronous (does not wait/irrespective of a clock) reset [`dff_asyncres.v`](./dff_asyncres.v)
 
 
 2. Flop with asynchronous (does not wait/irrespective of a clock) set
