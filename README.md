@@ -1,6 +1,5 @@
 # RTL-Design-and-Synthesis-using-sky130
 
-## Table Of Contents
 ## Table of Contents
 
 - [Day 1](#day-1)
@@ -34,9 +33,8 @@
 ---
 ## Day 1
 ## Topic : Introduction to Verilog, Simulation, and Synthesis
-## Tools Introduced : Icarus , GTKWave , Yosys
-
-##Installation Commands (macOS – using Homebrew)
+# Tools Introduced : Icarus , GTKWave , Yosys
+# Installation Commands (macOS – using Homebrew)
 
 ```bash
 > brew install iverilog
@@ -475,46 +473,35 @@ endmodule
 - In the above example , a and b are inputs of AND gate with a delay of 2 ns and i0 is the output wire of a and b. i0 is OR-ed with c input with a delay of 1ns. The waveform depicts the difference of 1 ns(momentarily y , the output goes low) which is called a GLITCH.
 
 - More combinationa circuits , more glitchy which is evident from above example.
-
 - To avoid glitches , we need a memory element that can store the value , which are called FLOPS.
-
 - Flop output changes only on the edge of the clock (even if inputs are glitchy , output will be stable).
 
 # How to code a Flop?
 
 Note: Initialize the flop (reset or set which can be either synchronous or asynchronous)
 
+  ![DFF with sync/async reset](images/dff-synch-asynch.png)
+
 1. Flop with asynchronous (does not wait/irrespective of a clock) reset [`dff_asyncres.v`](./dff_asyncres.v)
+2. Flop with asynchronous (does not wait/irrespective of a clock) set   [`dff_asyncset.v`](./dff_asyncset.v)
+3. Flop with synchronous (does not wait/irrespective of a clock) reset  [`dff_synch.v`](./dff_synch.v)
+4. Flop with synchronous and asynchronous reset  [`dff_synch_asynch.v`](./dff_synch_asynch.v)
 
-
-2. Flop with asynchronous (does not wait/irrespective of a clock) set
-
-```
-module dff_asynch(input clk ,input rst, input d , output reg q);
-always@(posedge clk, posedge rst)
-begin
-if(rst)
-q <= 1'b1; (set=1)
-else
-q <=d;
-end
-endmodule
+# Synthesis of Flops
 
 ```
-3. Flop with synchronous (does not wait/irrespective of a clock) reset
+> yosys
+> read_liberty -lib lib.sky...lib
+> read_verilog dff_asyncres.v tb_dff_ayncres.v
+> synth -top dff_ayncres
+> dfflibmap -liberty lib/sky...lib (looks only for dff)
+> abc -liberty lib/sky...lib
+> show
 
 ```
-module dff_asynch(input clk ,input rst, input d , output reg q);
-always@(posedge clk, posedge rst)
-begin
-if(rst)
-q <= 1'b1; (set=1)
-else
-q <=d;
-end
-endmodule
+ ![DFF with async reset - show](images/async-show.png)
 
-```
+ # Interesting optimization
    
 
 ---
