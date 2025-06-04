@@ -546,6 +546,61 @@ endmodule
 
 ### Introduction to optimizations
 
+- These are of two types ├──> Combinational
+                         |--> Sequential
+# Intro to Combinational:
+- Optimizations done over squeezing to get the most optimized design (efficient in terms of area , power)
+- Techniques: 1. Constant propagation ( Direct optimisation)
+              2. Boolean Logic optimisation ( K-Map etc)
+
+- Constant Propagation optimisation
+
+Taking an example, say , Y = ((AB) + C)' which on reducing will come down to => Y = C' (when A = 0)
+So , now drawing the circuit would give us usage of 6 MOS Transistors fro the above equation . But for the condition when A = 0 , we need only an invertor which takes only 2 MOS transistors which is the most optimised design.
+
+![Constant Propagation Example](images/const-prop.png)
+
+- Boolean logic optimisation
+
+Taking an example again: > assign y = a?(b?c:(c?a:0)):(!c)
+
+![Boolean Logic Optimisation](images/bool-exp.png)
+
+- Synthesis tools does this kind of Boolean reduction of expression to come up with the best optimised solution!!
+
+# Intro to sequential:
+
+- Basic one -> Sequential Constant Propagation
+- Advanced one -> 1. State optimisation | 2. Retiming | 3. Sequnetial Logic Cloning ( Floor Plan Aware Analysis)
+
+- Sequential Constant Propagation (Basic One)
+  Taking D-FF , D input tied low with a reset and Q connected to NAND gate as one of the inputs and A as another input woth output Y. Will Q become 1?
+  NO. Considering the reset signal , Q will always be 0 and hence Y will always be 1.
+  Hence , we can infer that Q is taking up a constant value which is why this is Sequential Constant. 
+
+  ![D-FF with Reset signal](images/seq-const.png)
+  
+ - Taking another case , where Set signal is considered in the above example. So , Q will be asynchronously be 1 (set) and when Set signal goes low , Q synchronously goes low. This shows that there is a necessity for the D-FF to be there in the circuit as Set can be both 0 or 1.
+ - Hence , we can infer that Q is not taking up a constant value which is why this is not a Sequential Constant. ( Not everytime an input tied up with 0 will have an output 0 only. Considering other factors like clock , set/reset signal is needed).
+
+  ![D-FF with Set signal](images/seq-const-set.png)
+
+# Advanced sequential optimisations: (Theory)
+
+  - State Optimisation: Optiimisation of unused state
+    
+  - Cloning: When doing a physical aware synthesis.
+    
+    Example: 3 Flops A,B,C are present. A combinational logic output is connected to A input and there is one more combinational logic that is present before B and C flops. ( Reference in below example picture). Considering to place this on a floorplan there will be a huge routing delay for A to travel to B as well as C. So considering a case where a huge positive slack is there for A and hence A value is basically cloned and now there are 2 copies of A one each for B and C. So , now the timing is met and there is no much greater delay.
+
+     ![Cloning](images/cloning.png)
+    
+  - Retiming:
+
+     In the below example , the logic has 5ns and 2ns delay respectively which clock at freq of 200MHz and 500MHz respectively which gives overall clock of 200MHz. So, to improve this , we try splitting the delay in such a way that clock can be increased. This is called retiming. So , now splitting the delay as 4ns and 3 ns gives us a freq of 250MHz and 333MHz respectively which gives out a output clock of 250 MHz.
+  
+  ![Retiming](images/retiming.png)
+
 ### Combinational logic optimizations
 
 ### Sequential logic optimizations
