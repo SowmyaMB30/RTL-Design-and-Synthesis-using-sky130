@@ -601,8 +601,9 @@ Taking an example again: > assign y = a?(b?c:(c?a:0)):(!c)
   
   ![Retiming](images/retiming.png)
 
-### Combinational logic optimizations - Labs
+### Combinational logic optimizations 
 
+- Labs
 - Files used : opt named files (opt_check)
   
 # opt_check
@@ -666,8 +667,9 @@ abc -liberty lib/sky...lib
 
 ![opt check3 output](images/opt-check3-show.png)
 
-### Sequential logic optimizations - Labs
+### Sequential logic optimizations 
 
+- Labs
 - Files : *dff_const* (command to search in a directory) named files
 
 # dff_const1.v
@@ -763,12 +765,109 @@ show
 
 - Unused output optimisation
   
+# counter_opt.v
+
+```
+module counter_opt (input clk , input reset , output q);
+reg [2:0] count;
+assign q = count[0];
+
+always @(posedge clk ,posedge reset)
+begin
+        if(reset)
+                count <= 3'b000;
+        else
+                count <= count + 1;
+end
+
+endmodule
+```
+![Counter_opt](images/counter-opt.png)
+
+# Synthesis of counter_opt.v
+
+![Counter opt Show](images/counter-opt-show.png)
+
+
 
 ---
 
 ## Day 4
 
 ### GLS, Synthesis-Simulation mismatch and Blocking/Non-blocking statements
+
+# What is GLS - Gate Level Simulation
+
+- Running the testbench with netlist (same as RTL Code) as Design Under Test. (inputs and outputs of RTL code and netlist are the same!!!)
+
+# Why GLS?
+
+1. Verify logical correctness of design after synthesis
+2. Ensuring the timing of the design is met. ( Setup , hold time are met etc)
+Note: To run GLS for timing, we need to run it with GLS Annotation.
+
+# GLS Using iVerilog
+
+![GLS using iverilog](images/gls-iverilog.png)
+
+
+![GLS using iverilog](images/how-gls.png)
+
+# Synthesis Simulation Mismatch
+
+- Why it happens?
+1. Missing sensitivity list
+2. Blocking and non blocking assignment
+3. Non standard verilog coding
+   
+# 1. Missing sensitivity list
+
+- How simulator works?
+- Works based on activity. -> Output changes according to input change.
+```
+module mux(input i0 , input i1, input sel , output reg y);
+always@(sel) (whenever sel changes)
+begin
+if(sel)  (sel is high , connect y to i1)
+y=i1;
+else
+y=i0;   (sel is low , connect y to i0)
+end
+endmodule
+```
+- Above example infers that only if sel changes , y changes else there is no change. ( A LATCH!!)
+- But if we make a minor change in the code , this latch can be avoided.
+
+```
+module mux(input i0 , input i1, input sel , output reg y);
+always@(*) (whenever any signal changes)
+begin
+if(sel)  
+y=i1;
+else
+y=i0;   
+end
+endmodule
+```
+![Missing Sensitivity List](images/sens-list.png)
+
+# Blocking/Non-blocking statements
+
+- Comes into picture only when using always blocks.
+- Inside always block , = means blocking , <= means non-blocking
+
+  [D/B Blocking and Non-Blocking assignment](images/block-vs-nonblock.png)
+
+  # Caveats with Blocking Assignments
+
+  [Caveats-Blocking](images/caveats-block.png)
+
+  [Caveats-Blocking](images/caveats-block1.png)
+
+  [Caveats-Blocking](images/caveats-block3.png)
+
+ - The above picture shows that both the code yields the sae synthesis output. But the simulations will be different. This causes a simulation-synthesis mismatch! It is very important to check the curcuit behaviour and match the output without any simulation-synthesis mismatch. This is why GLS is needed.
+  
 
 ### Labs on GLS and Synthesis-Simulation Mismatch
 
