@@ -601,11 +601,168 @@ Taking an example again: > assign y = a?(b?c:(c?a:0)):(!c)
   
   ![Retiming](images/retiming.png)
 
-### Combinational logic optimizations
+### Combinational logic optimizations - Labs
 
-### Sequential logic optimizations
+- Files used : opt named files (opt_check)
+  
+# opt_check
+```
+module opt_check(input a , input b , output y )
+assign y = a?b:0;
+endmodule
+```
+# opt_check2
+
+```
+module opt_check2(input a , input b, output y)
+assign y = a?1:b;
+endmodule
+```
+![opt check](images/opt-check.png)
+
+- From the above, we can understand that opt-check2 is actually Consensus Theorem.
+
+# opt_check3
+
+```
+module opt_check3(input a , input b,inout c, output y)
+assign y = a?(c?b:0):0;
+endmodule
+```
+![opt check](images/opt-check3.png)
+
+
+
+# Synthesis - opt_check
+- opt_check:
+```
+yosys
+read_liberty -lib lib/sky...lib
+read_verilog opt_check.v
+synth -top opt_check
+opt_clean -purge (constant prop and optimisation command)
+abc -liberty lib/sky...lib
+show
+```
+![opt check output](images/opt-check-show.png)
+
+- opt_check2:
+  
+```
+read_verilog opt_check2.v
+synth -top opt_check2
+opt_clean -purge
+abc -liberty lib/sky...lib
+```
+![opt check2 output](images/opt-check2-show.png)
+
+- opt_check3
+```
+read_verilog opt_check3.v
+synth -top opt_check3
+opt_clean -purge
+abc -liberty lib/sky...lib
+```
+
+![opt check3 output](images/opt-check3-show.png)
+
+### Sequential logic optimizations - Labs
+
+- Files : *dff_const* (command to search in a directory) named files
+
+# dff_const1.v
+
+```
+module dff_const1(input clk, input reset, output reg q);
+always @(posedge clk, posedge reset)
+begin
+        if(reset)
+                q <= 1'b0;
+        else
+                q <= 1'b1;
+end
+
+endmodule
+```
+# dff_const2.v
+
+```
+module dff_const2(input clk, input reset, output reg q);
+always @(posedge clk, posedge reset)
+begin
+        if(reset)
+                q <= 1'b1;
+        else
+                q <= 1'b1;
+end
+
+endmodule
+
+```
+
+![dff_const](images/dff-const.png)
+
+# dff_const3.v
+
+```
+module dff_const3(input clk, input reset, output reg q);
+reg q1;
+
+always @(posedge clk, posedge reset)
+begin
+        if(reset)
+        begin
+                q <= 1'b1;
+                q1 <= 1'b0;
+        end
+        else
+        begin
+                q1 <= 1'b1;
+                q <= q1;
+        end
+end
+
+endmodule
+```
+![dff_const3](images/dff-const3.png)
+
+# Synthesis of dff_const1
+
+```
+read_verilog dff_const1.v
+synth -top dff_const1
+dfflibmap -liberty lib/sky....130
+abc -liberty lib/sky...lib
+show
+```
+![dff_const1](images/dff-const1.png)
+
+# Synthesis of dff_const2
+
+```
+read_verilog dff_const2.v
+synth -top dff_const2
+dfflibmap -liberty lib/sky....130
+abc -liberty lib/sky...lib
+show
+```
+![dff_const2](images/dff-const2.png)
+
+# Synthesis of dff_const3
+
+```
+read_verilog dff_const3.v
+synth -top dff_const3
+dfflibmap -liberty lib/sky....130
+abc -liberty lib/sky...lib
+show
+```
+![dff_const2](images/dff-const3-show.png)
 
 ### Sequential optimizations for unused outputs
+
+- Unused output optimisation
+  
 
 ---
 
