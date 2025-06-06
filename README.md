@@ -871,21 +871,289 @@ endmodule
 
 ### Labs on GLS and Synthesis-Simulation Mismatch
 
+- How to invoke GLS and some exp with GLS
+We need netlist , verilog models and testbench
+# Ternary operator - Mux
+<cond> ? <True> : <False>
+
+```
+iverilog ternary_operator_mux.v tb_ternary_operator_mux.v
+./a.out
+gtkwave ternary_operator_mux.vcd
+yosys
+read_liberty -lib lib/sky.....lib
+read_verilog ternary_operator_mux.v
+synth -top ternary_operator_mux
+abc -liberty lib/sky....lib
+write_verilog -noattr ternary_operator_mux_net.v
+show
+```
+FOR GLS:
+
+```
+exit
+iverilog my_lib/verilog_model/sky130_fd_sc_hd.v  my_lib/verilog_model/primitives.v ternary_operator_mux_net.v tb_ternary_operator_mux.v
+./a.out
+gtkwave tb_ternary_operator_mux.vcd
+```
+bad_mux.v
+- In simulation , it shows a flop kind of behaviour
+- In synthesis ,
+```
+iverilog bad_mux.v tb_bad_mux.v
+./a.out
+gtkwave tb_bad_mux.vcd
+```
+![Bad Mux Simulatioon](images/bad-mux.png)
+
+```
+yosys
+read_verilog bad_mux.v
+synth -top bad_mux
+abc -liberty lib/sky....lib
+write_verilog bad_mux_net.v
+exit
+iverilog my_lib/verilog_model/sky130_fd_sc_hd.v  my_lib/verilog_model/primitives.v bad_mux_net.v tb_bad_mux.v
+./a.out
+gtkwave tb_bad_mux.vcd
+
+```
+![Bad Mux Simulatioon - GLS](images/bad-mux-gls.png)
+
+- This differene is called synth-sim mismatch
+  
 ### Labs on synth-sim mismatch for blocking statements
+
+# blocking_caveat.v
+
+- Blocking statements are main reason for synth-simulation mismatch and hence careful analysis is needed to use the blocking assignments.
+- These errors are huge mistakes and use it with utmost care and clarity! ( AVOID!!!!)
+
 
 ---
 
 ## Day 5
 
 ### If Case constructs
+- If and case statements and case statement dangers
+- If statements used to make priority logic.
+
+```
+if <cond>
+begin
+
+
+end
+else
+begin
+
+end
+```
+- Taking the else if statements , the hardware will be as follows:
+
+![If-case HW](images/if-case.png)
+
+
+# Dangers with if => INFERED LATCHES
+
+- Bad coding style
+- Incomplete if statement
+```
+if<cond1>
+y=a
+else if <cond2>
+y = b
+(no else)
+```
+The HW will be:
+
+![Dangers of if](images/dangers-if.png)
+
+From above we can infer that when all the conditions are not given , then a latch will be inferred for one of the input.
+
+# COUNTER
+
+![Counter](images/counter.png)
+
+From the above image , we can infer there is an incomplete if statement and the hardware tells that , if no enable , count should latch on to previous value. This example , latch is fine as it is needed.
+
+- Combinational circuit cant have a latch ( like the previous example)
+
+# CASE STATEMENT
+ - If , case are used inside always block
+ - Variable assigned in case or if should be register variable
+ - Case also infer mux.
+ ![Case Statement](images/case.png)
+
+# CAVEATS WITH CASE
+
+1.Incomplete Case statements => Infered latches
+  
+  ![Case Statement](images/case1.png)
+
+Above example leads to latches (C3 , C4 latches on output)
+- Solution : Code default case
+With default , we avoid infered latches
+
+2.Partial assignments in Case
+
+![Case Statement](images/case2.png)
+
+In the above code , we have infered for 0 that x gets a and y gets b. But for 1 , x gets c but y? => Infered latch
+Even though , default case is there , there is a latch. ( As there is no value assigned for 1 for y)
+Solution : Assign values for all outputs.
+
+3. Going to be comparison for ( if ,else if, else if ,else) and case:
+
+if ,else if, else if ,else
+- Only one portion of the code will execute.
+
+case:
+- Code executes one after other
+- Taking example 2'b10 and 2'b1x ( even if all cases match , it will check all the cases)
+- No overlapping cases should be written
+    
+
+![Case Statement](images/case3.png)
+
 
 ### Labs on "Incomplete If Case"
 
+- How simulator and synthesis tools infer for all the wrong if statements
+- FILES: incomp
+# incomp_if.v
+
+![Incomplete If](images/d-latch.png)
+
+Synthesis output:
+
+![Incomplete If - Synthesis](images/d-latch1.png)
+
+- This is infered latch
+  
+# incomp_if2
+
+![Incomplete If](images/incomp-if2.png)
+
+Synthesis
+
+![Incomplete If](images/incomp-if2-show.png)
+
+
 ### Labs on "Incomplete overlapping Case"
+
+# incomp_case.v
+
+whenever sel[1] = 1 , value is latched => sel[1] should be 0.
+
+![Incomplete Case](images/incomp-case.png)
+
+Synthesis
+
+![Incomplete Case](images/incomp-case-show.png)
+
+# comp_case.v
+
+- This is the complete case for the incomplete case that we saw earlier.
+
+![Complete Case](images/comp-case.png)
+
+Synthesis
+
+![Complete Case](images/comp-case-show.png)
+
+# partial_case_assign.v
+
+![Partial Complete Case](images/partial-comp.png)
+
+Synthesis
+
+![Partial Complete Case](images/partial-comp-show.png)
+
+# bad_case.v
+
+![Bad Case](images/bad-case-rtl.png)
+
+- Use GLS commands to generate the netlist
+
+![Bad Case](images/bad-case-gls.png)
+
 
 ### for loop and for generate
 
+- how to use looping constructs to simulate hardware
+- for loop (used inside always | used for evaluating expressions )
+- generate-followed by a for loop ( used outside always/ cant be used inside  always | used for instantiating hardware multiple times)
+Eg : Building 2:1 mux , 4:1 mux , 32:1 mux
+
+
+![Building Mux](images/for-loop.png)
+
+![Building Mux](images/for-loop1.png)
+
+- Simple and elegant way of writing the higher order mux taking assumption of the bus length.
+# For DEMUX:
+1*8 Demux:
+- For wide mux/demux , for statements are very handy and usage if blocking assignments is very useful.
+
+![Building Demux](images/demux.png)
+
+# For generate
+
+- Used for replicating the hardware.
+- genvar i - generate variable i
+
+![For generate code](images/gen-var.png)
+
+# Ripple carry adder (RCA) - example
+
+
+![Ripple Carry Adder](images/rca.png)
+
+- Full adder needed to be instantiated 3 times. ( There might be a need for a single hardware to be instantiated multiple times)
+- That is why , we use for generate/ if generate.
+
+![D/B for and for-generate](images/for-for-generate.png)
+
 ### Labs on "for loop" and "for generate"
+
+# FOR LOOP
+- File : mux_generate.v
+
+![Mux Generate](images/mux-gen.png)
+
+- Same code using case statement will be hard. The 4 lines of code changes everything as the k value can be changed to 256 , 1024 or 4.
+
+- File : demux_generate
+
+![Demux Generate](images/demux-generate.png)
+
+- We can infer that the lines of code has been reduced and how it reduces the complexity of the hardware.
+
+Simulation of both case and generate:
+
+![Demux Case - Simulation](images/demuc-case.png)
+
+![Demux Generate - Simulation](images/demux-generate-rtl.png)
+
+- We infer both are same. Only difference is coding is made simpler!!!
+
+# FOR GENERATE LOOP
+
+![RCA in 2 ways](images/rtl-full-adder1.png)
+
+![Rule for addition](images/rule-for-add.png)
+
+Simulation:
+
+```
+iverilog fa.v rca.v tb_rca.v
+.
+.
+.
+```
+
+
 
 
 
